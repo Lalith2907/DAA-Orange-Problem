@@ -8,7 +8,15 @@
 
 // Function to create the Bad Character Shift Table
 int* bcst_create(const char* pattern, int pattern_len) {
-    // TODO BCST creation
+    int* bcst=(int*)malloc(sizeof(int)*26);
+    for(int i=0; i<26; i++)
+    {
+        bcst[i]=pattern_len;
+    }
+    for(int j=0; j<pattern_len-1; j++)
+    {
+        bcst[pattern[j]-'a']=pattern_len-j-1;
+    }
     return bcst;
 }
 
@@ -103,14 +111,32 @@ int* gsst_create(const char* pattern, int pattern_len) {
 // Boyer-Moore search function
 int boyer_moore(const char* text, const char* pattern, int* bcst, int* gsst, FILE* output_file) 
 {
-    // TODO variables initializations
-
+    int text_len=strlen(text);
+    int pattern_len=strlen(pattern);
+    int comparisons=0;
+    int pos=pattern_len-1;
 	fprintf(output_file,"Occurrences:");
     while (pos < text_len) {
-        // TODO find indices of occurances
+        int i=0;
+        while(i<pattern_len && pattern[pattern_len-i-1]==text[pos-i])
+        {
+            i++;
+            comparisons++;
+        }
+        int match=i;
         if (match == pattern_len) {
+            int end=pos;
             fprintf(output_file,"%d,", end - pattern_len + 1);
-            //TODO
+            pos+=1;
+        }
+        else
+        {
+            comparisons++;
+            char bad_char=text[pos-i];
+            int bc_shift=bcst[text[pos]-'a'];
+            int gs_shift=gsst[i];
+            int shift=(bc_shift>gs_shift) ? bc_shift : gs_shift;
+            pos+=shift;
         }
     }
     fprintf(output_file,"\n");
@@ -152,8 +178,8 @@ void testcase(FILE* values_file, FILE* input_file, FILE* output_file)
 
 int main() {
 	FILE *input_file = fopen("input.txt", "r");
-    FILE *output_file = fopen("boyermoore_output.txt", "w");
-    FILE *values_file = fopen("boyermoore_values.txt", "w");
+    FILE *output_file = fopen("boyermoore_output_PES2UG23CS048.txt", "w");
+    FILE *values_file = fopen("boyermoore_values_PES2UG23CS048.txt", "w");
 
     if (!input_file || !output_file || !values_file) {
         printf("Error opening file!\n");

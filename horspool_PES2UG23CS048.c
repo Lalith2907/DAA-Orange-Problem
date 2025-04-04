@@ -8,31 +8,43 @@
 
 void init_table(int* shift_table,int n)
 {
-	//TODO
+	for (int i = 0; i < 26; i++) {
+		shift_table[i] = n;
+	}
 }
 
 // Construct the Bad Character Shift table
 void preprocess(int* shift_table,char* pattern)
 {
-	//TODO
+	int len = strlen(pattern);
+	for (int j = 0; j < len - 2; j++) {
+		shift_table[pattern[j] - 'a'] = len - 1 - j;
+	}
 }
 
 int string_match(int* shift_table,char* pattern,char* text,FILE* output_file)
 {
 	// TODO Variables initialization
 	int matches;
-	int star_pos;
-	char star_char;
-	int cmp;
-	int occurance;
+	int star_pos = strlen(pattern) - 1;
+	char star_char = pattern[star_pos];
+	int cmp = 0;
+	int occurance = 0;
 	fprintf(output_file,"Occurrences:");
 	while(star_pos<strlen(text))
 	{
-		//TODO find index of occurances
+		matches = 0;
+		while (matches <= strlen(pattern) && (cmp++, pattern[strlen(pattern) - 1 - matches] == text[star_pos - matches])) {
+			matches++;
+		}
 		if(matches==strlen(pattern))
 		{
-				fprintf(output_file,"%d,",index);
-				//TODO
+			int index = star_pos - strlen(pattern) + 1;
+			fprintf(output_file,"%d,",index);
+			break;
+		}
+		else {
+			star_pos = star_pos + shift_table[text[star_pos] - 'a'];
 		}
 	}
 	fprintf(output_file,"\n");
@@ -70,8 +82,8 @@ void testcase(FILE* values_file, FILE* input_file, FILE* output_file)
 int main()
 {	
 	FILE *input_file = fopen("input.txt", "r");
-    FILE *output_file = fopen("horspool_output.txt", "w");
-    FILE *values_file = fopen("horspool_values.txt", "w");
+    FILE *output_file = fopen("horspool_output_PES2UG23CS048.txt", "w");
+    FILE *values_file = fopen("horspool_values_PES2UG23CS048.txt", "w");
 
     if (!input_file || !output_file || !values_file) {
         printf("Error opening file!\n");
